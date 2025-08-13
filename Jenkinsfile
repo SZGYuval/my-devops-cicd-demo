@@ -7,7 +7,6 @@ pipeline {
 
     environment {
         NAME           = "python-app"
-        VERSION        = "${env.BUILD_ID}-${env.GIT_COMMIT}"
         PROJECT_NAME   = "${JOB_NAME}"
         AWS_ACCOUNT_ID = '485701710361'
         AWS_REGION     = 'eu-north-1'
@@ -16,6 +15,14 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                // Ensure VERSION file exists (defaults to 1.0.0 on first run)
+                sh 'test -f VERSION || echo "1.0.0" > VERSION'
+            }
+        }
+
         stage('Build Image') {
             steps {
                 script {
