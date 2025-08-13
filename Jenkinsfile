@@ -61,7 +61,16 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker run -d -p 5000:5000 --name python-app "$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"'
+                sh '''
+                    # If the container exists, stop and remove it
+                    if [ "$(docker ps -a -q -f name=python-app)" ]; then
+                        echo "Container 'python-app' already exists. Removing..."
+                        docker rm -f python-app
+                    fi
+
+                    # Run new container from latest image
+                    docker run -d -p 5000:5000 --name python-app "$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"
+                    '''
             }
         }
     }
