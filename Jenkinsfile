@@ -41,5 +41,15 @@ pipeline {
                 '''
             }
         }
+
+        stage('Push Image') {
+            steps {
+                sh '''
+                set -e
+                # Push versioned tag
+                docker push "$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"
+                '''
+            }
+        }
     }
 }
