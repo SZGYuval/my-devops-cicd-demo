@@ -1,0 +1,29 @@
+version: 0.2
+env:
+  variables:
+    ECR_REPO: 485701710361.dkr.ecr.eu-north-1.amazonaws.com/szgyuval-devops-cicd
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to ECR...
+      - LOGIN_PASSWORD=$(aws ecr get-login-password --region $AWS_DEFAULT_REGION)
+      - echo "$LOGIN_PASSWORD" | docker login --username AWS --password-stdin $ECR_REPO
+      - echo Determining version from tag...
+      - TAG_NAME=${CODEBUILD_WEBHOOK_TRIGGER##*/}
+      - echo "Parsed TAG_NAME=$TAG_NAME"
+      - IMAGE_TAG=$TAG_NAME
+      - echo "Building Docker image with tag $IMAGE_TAG"
+  build:
+    commands:
+      - echo Building Docker image...
+      - cd app
+      - docker build -t $ECR_REPO:$IMAGE_TAG .
+  post_build:
+    commands:
+      - echo Pushing Docker image...
+      - docker push $ECR_REPO:$IMAGE_TAG
+      - printf '[{"name":"hello-world","imageUri":"%s"}]' $ECR_REPO:$IMAGE_TAG > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
