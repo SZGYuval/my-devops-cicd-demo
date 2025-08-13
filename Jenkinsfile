@@ -61,7 +61,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker run -p 30005:5000 --name python-app "$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"'
+                sh 'docker run -d -p 30005:5000 --name python-app "$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"'
             }
         }
     }
