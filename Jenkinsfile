@@ -68,7 +68,6 @@ pipeline {
                         docker rm -f python-app
                     fi
 
-                    # Run new container from latest image
                     docker run -d -p 5000:5000 --name python-app "$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"
                     '''
             }
